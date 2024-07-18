@@ -1,0 +1,151 @@
+///////STAFF FRAME CODE SNIPPETS
+
+public class AdminStaffFrame extends javax.swing.JFrame {
+  //database connection
+    String url = "jdbc:mysql://127.0.0.1:3306/";
+    //database name
+    String dbName = "finalproject";
+    //String driver = "com.mysql.cj.jdbc.Driver";
+    String userName = "root";
+    String password = "passw";
+    PreparedStatement prest = null;
+
+    Staff s;
+    
+//search button results 
+private void jButtonSearchSurnameActionPerformed(java.awt.event.ActionEvent evt) {                                                     
+        s = new Staff();
+        s.setSurname(jTextFieldSearchSurname.getText());
+
+        try {
+//connecction
+            Connection con = DriverManager.getConnection(url + dbName, userName, password);
+            System.out.println("connected");
+//SQL 
+            String sql = "SELECT * FROM staff WHERE surname = ?";
+            prest = con.prepareStatement(sql);
+            prest.setString(1, s.getSurname());
+//Results of the sql stored in the resultSet rs1
+            ResultSet rs = prest.executeQuery();
+//This will loop and show all the results from the sql query
+            while (rs.next()) {
+                
+                s.setStaffId(rs.getInt(1));
+                s.setFirstName(rs.getString(3));
+                s.setMiddleName(rs.getString(4));
+                s.setSurname(rs.getString(5));
+                s.setAddressLine1(rs.getString(6));
+                s.setAddressLine2(rs.getString(7));
+                s.setCounty(rs.getString(8));  
+                s.setEircode(rs.getString(9));
+                s.setEmail(rs.getString(10));
+                s.setPhoneNumber(rs.getString(11));
+                s.setDateOfBirth(rs.getString(12));
+                s.setPpsn(rs.getString(13));
+                jTextFieldID.setText(s.getStaffId() + "");
+                jTextFieldFirstName.setText(s.getFirstName());
+                jTextFieldMiddleName.setText(s.getMiddleName());
+                jTextFieldSurname.setText(s.getSurname());
+                jTextFieldAddress1.setText(s.getAddressLine1());
+                jTextFieldAddress2.setText(s.getAddressLine2());
+                jTextFieldCounty.setText(s.getCounty());
+                jTextFieldEircode.setText(s.getEircode());
+                jTextFieldEmail.setText(s.getEmail());
+                jTextFieldPhNumber.setText(s.getPhoneNumber());
+                jTextFieldDoB.setText(s.getDateOfBirth());
+                jTextFieldPPSN.setText(s.getPpsn());
+                              
+                jComboBoxSearchResults.addItem(s.getFirstName()); //adding first names to the combobox list
+                jButtonDeleteStaff.setEnabled(true);
+            }
+        } catch (SQLException err) {
+            System.out.println(err.getMessage());
+        }
+        
+        if (jTextFieldSurname.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "No Staff with the surname " + jTextFieldSearchSurname.getText() + " found in database..");
+        }else{
+            jButtonSearchSurname.setEnabled(false);
+            jButtonDeleteStaff.setEnabled(true);
+            jButtonUpdateStaff.setEnabled(true);
+        }
+       
+    }      
+
+  //clearing the search action when pressing button
+    private void jButtonClearSearchActionPerformed(java.awt.event.ActionEvent evt) {                                                   
+        jTextFieldSearchSurname.setText("");
+        jTextFieldID.setText("");
+        jTextFieldFirstName.setText("");
+        jTextFieldMiddleName.setText("");
+        jTextFieldSurname.setText("");
+        jTextFieldAddress1.setText("");
+        jTextFieldAddress2.setText("");
+        jTextFieldCounty.setText("");
+        jTextFieldEircode.setText("");
+        jTextFieldEmail.setText("");
+        jTextFieldPhNumber.setText("");
+        jTextFieldDoB.setText("");
+        jTextFieldPPSN.setText("");
+        
+        //clearing the combo box
+        
+        int size= jComboBoxSearchResults.getItemCount();
+        for(int i=1; i<(size);i++){
+            jComboBoxSearchResults.removeItemAt(1);         
+        }
+        
+        jButtonSearchSurname.setEnabled(true);
+        jButtonDeleteStaff.setEnabled(false);
+        jButtonUpdateStaff.setEnabled(false);
+    }
+
+
+////////// TUTOR FRAME CODE SNIPPETS
+
+//showing all the students who passed the course
+private void jButtonPassedActionPerformed(java.awt.event.ActionEvent evt) {                                              
+        DefaultTableModel model = (DefaultTableModel) jTable.getModel();
+        model.setRowCount(0);
+
+        try {
+// Notice, do not import com.mysql.cj.jdbc.* 
+// or you will have problems! 
+            Connection con = DriverManager.getConnection(url + dbName, userName, password);
+            System.out.println("connected");
+//A SQL statement is precompiled and stored in a PreparedStatement object. This object can //then be used to efficiently execute this statement multiple times.  
+
+//SQL            
+            String sql = """
+                         SELECT student.first_name, student.surname, student.class_group_code,  assessment.module_code , module.module_name, assessment.assessment_1, assessment.assessment_2, assessment.exam,assessment.result,assessment.assessment_id 
+                         FROM student 
+                         INNER JOIN student_has_assessment ON student.student_id = student_has_assessment.student_id
+                         INNER JOIN assessment ON student_has_assessment.assessment_id = assessment.assessment_id
+                         INNER JOIN module on assessment.module_code = module.module_code
+                         WHERE assessment.result >=50 AND assessment.result <= 64;""";
+              
+            prest = con.prepareStatement(sql);
+//Results of the sql stored in the resultSet rs
+            ResultSet rs = prest.executeQuery();
+
+//This will loop and show all the results from the sql query
+            while (rs.next()) {
+
+                stu.setFirstName(rs.getString(1));
+                stu.setSurname(rs.getString(2));
+                stu.setCourseCode(rs.getString(3));
+                moduleName = rs.getString(4);
+                moduleCode = rs.getString(5);
+                assessment1 = rs.getInt(6);
+                assessment2 = rs.getInt(7);
+                exam = rs.getInt(8);
+                result = rs.getInt(9);
+                assessmentID = rs.getInt(10);
+
+                model.addRow(new Object[]{stu.getFirstName(), stu.getSurname(), stu.getCourseCode(), moduleName, moduleCode, assessment1, assessment2, exam, result, assessmentID});
+
+            }
+        } catch (SQLException err) {
+            System.out.println(err.getMessage());
+        }
+    }
