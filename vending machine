@@ -1,0 +1,129 @@
+public class MethodClass {
+    //creating a method where we add the temporary coins in the machine
+    public static void addTempCoins() {
+        noOf2eur = noOf2eur + temp2eur;
+        noOf1eur = noOf1eur + temp1eur;
+        noOf50cent = noOf50cent + temp50cent;
+        noOf20cent = noOf20cent + temp20cent;
+        noOf10cent = noOf10cent + temp10cent;
+    }
+    //creating a method where we remove all the temporary coins from the machine
+    public static void removeTempCoins() {
+        temp2eur = 0;
+        temp1eur = 0;
+        temp50cent = 0;
+        temp20cent = 0;
+        temp10cent = 0;
+    }
+    //creating a method where we round sum of money added to ensure the correct display of numbers 
+    public static double roundMoney(double money) {
+        double roundedMoney = Math.round(money * 100) / 100.0;
+        return roundedMoney;
+    }
+    // creating a while loop where the machine checks the coin stock and gives change accordingly
+    public static void changeLoop() {
+        while (change > 0.0) {
+            
+            if ((change >= 2.0) && (noOf2eur > 0)) {
+                noOf2eur--;
+                change -= 2.0;
+                change = roundMoney(change);
+                System.out.println("given 2 euro");
+
+            } else if ((change >= 1.0) && (noOf1eur > 0)) {
+                noOf1eur--;
+                change -= 1.0;
+                change = roundMoney(change);
+                System.out.println("given 1 euro");
+
+            } else if ((change >= 0.5) && (noOf50cent > 0)) {
+                noOf50cent--;
+                change -= 0.5;
+                change = roundMoney(change);
+                System.out.println("given 50 cent");
+
+            } else if ((change >= 0.2) && (noOf20cent > 0)) {
+                change -= 0.2;
+                change = roundMoney(change);
+                noOf20cent--;
+                System.out.println("given 20 cent");
+
+            } else if ((change >= 0.1) && (noOf10cent > 0)) {
+                change -= 0.1;
+                change = roundMoney(change);
+                noOf10cent--;
+                System.out.println("given 10 cent");
+            } else {
+                change = 0;
+            }
+
+        }
+
+    }
+}
+
+//action that happens when pressing the buy drink button on the vending machine
+
+private void jButtonPepsiLight2ActionPerformed(java.awt.event.ActionEvent evt) {                                                   
+        //checking if there is any change in the vending machine
+        if ((noOf50cent == 0) || (noOf20cent == 0) || (noOf10cent == 0)) {
+            jTextArea1.setText("\n  Change error\n Admin Required");
+            timer.setRepeats(false);
+            timer.start();
+        } else {
+            if (noOfPepsiLight2 > 0) {
+                if (coinsIn < 2.10) {
+                    jTextArea1.setText("\n   Not enough \n       credit" + "\n Returned " + coinsIn);
+                    timer.setRepeats(false);
+                    timer.start();
+                } else if (coinsIn == 2.10) {
+                    jTextArea1.setText("\n\n     Enjoy!");
+                    change = coinsIn -= 2.10;
+                    change = roundMoney(change);
+                    noOfPepsiLight2--;
+
+                    addTempCoins();
+
+                    timer.setRepeats(false);
+                    timer.start();
+
+                    jLabelPepsiLight.setVisible(true);
+
+                    timerPepsiLight.setRepeats(false);
+                    timerPepsiLight.start();
+                } else {
+                    change = coinsIn -= 2.10;
+                    change = roundMoney(change);
+                    noOfPepsiLight2--;
+
+                    addTempCoins();
+
+                    jTextArea1.setText("\n   Please take\n   your change:\n      €" + String.format("%.2f", change) + "\n      Enjoy!");
+                    timer.setRepeats(false);
+                    timer.start();
+
+                    changeLoop();
+
+                    jLabelPepsiLight.setVisible(true);
+
+                    timerPepsiLight.setRepeats(false);
+                    timerPepsiLight.start();
+
+                }
+                coinsIn = 0.0;
+                jTextFieldDisplay.setText("Inserted: €" + coinsIn);
+            } else if (coinsIn > 0) {
+                jTextArea1.setText("\nItem out of stock\n Returning €" + String.format("%.2f", coinsIn));
+
+                timer.setRepeats(false);
+                timer.start();
+                coinsIn = 0.0;
+                jTextFieldDisplay.setText("Inserted: €" + String.format("%.2f", coinsIn));
+            } else {
+                jTextArea1.setText("\nItem out of stock");
+                timer.setRepeats(false);
+                timer.start();
+            }
+        }
+        removeTempCoins();
+    }
